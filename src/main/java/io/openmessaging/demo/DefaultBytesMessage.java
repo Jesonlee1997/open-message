@@ -5,13 +5,15 @@ import io.openmessaging.KeyValue;
 import io.openmessaging.Message;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 public class DefaultBytesMessage implements BytesMessage, Serializable {
 
     private KeyValue headers = new DefaultKeyValue();
-    private KeyValue properties;
+    private KeyValue properties = new DefaultKeyValue();
     private byte[] body;
+
+    public DefaultBytesMessage() {
+    }
 
     public DefaultBytesMessage(byte[] body) {
         this.body = body;
@@ -81,7 +83,8 @@ public class DefaultBytesMessage implements BytesMessage, Serializable {
     public String toString() {
         return "DefaultBytesMessage{" +
                 "headers=" + headers +
-                ", body=" + Arrays.toString(body) +
+                ", properties=" + properties +
+                ", body=" + new String(body) +
                 '}';
     }
 }

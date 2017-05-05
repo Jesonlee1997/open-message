@@ -17,7 +17,7 @@ import java.util.List;
 public class TestSerialize {
     private static MessageFactory messageFactory = new DefaultMessageFactory();
 
-    private static String basePath = "J:\\Github\\openmessagingdemotester\\src\\main\\java\\io\\openmessaging\\demo\\test\\";
+    private static String basePath = "J:\\Github\\openmessagingdemotester\\src\\main\\java\\io\\openmessaging\\demo\\test.sadesfwe\\";
 
     @Test
     //测试一次写入含有500个数据的List的效率高还是一次一次写入1个Message的效率高
@@ -88,6 +88,7 @@ public class TestSerialize {
         System.out.println(end - start);
     }
 
+    @Test
     public void testByteWrite() throws IOException {
         BytesMessage[] messages = new BytesMessage[50000];
         for (int i = 0; i < messages.length; i++) {
@@ -98,7 +99,6 @@ public class TestSerialize {
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         for (BytesMessage message : messages) {
             fileOutputStream.write(message.getBody());
-            message.properties();
         }
 
         long end = System.currentTimeMillis();

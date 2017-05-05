@@ -11,8 +11,8 @@ import java.io.ObjectOutputStream;
  */
 public class TestCreateFile {
     public static void main(String[] args) throws IOException {
-        File base = new File("J:\\Github\\openmessagingdemotester\\src\\main\\java\\io\\openmessaging\\demo\\test");
-        File file = new File(base, "test.txt");
+        File base = new File("J:\\Github\\openmessagingdemotester\\src\\main\\java\\io\\openmessaging\\demo\\test.sadesfwe");
+        File file = new File(base, "test.sadesfwe.txt");
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
         for (int i = 0; i < 100; i++) {
