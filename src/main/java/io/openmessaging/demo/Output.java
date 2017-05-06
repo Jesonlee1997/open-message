@@ -17,16 +17,32 @@ import static io.openmessaging.demo.serialize.Constants.*;
  * on 2017/5/5.
  */
 public class Output {
-    private int position;
     private final RandomAccessFile memoryMappedFile;
-    private final MappedByteBuffer outPut;
+    private MappedByteBuffer outPut;
+    private int mappedSize;
+    private static final int DEFAULT_MAPPEDSIZE = 16 * 1024 * 1024;
 
-    public Output(String fileName, int size) throws IOException {
+    public Output(String fileName) throws IOException {
         memoryMappedFile = new RandomAccessFile(fileName, "rw");
-        outPut = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, size + 1);
+        mappedSize = DEFAULT_MAPPEDSIZE;
+        outPut = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, mappedSize);
+    }
+
+    public Output(String fileName, int mappedSize) throws IOException {
+        memoryMappedFile = new RandomAccessFile(fileName, "rw");
+        this.mappedSize = mappedSize;
+        outPut = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, this.mappedSize);
     }
 
     public void writeMessage(BytesMessage bytesMessage) {
+        if (outPut.position() >= (mappedSize - 1024)) {
+            try {
+                reMap();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         outPut.put(MESSAGESTART);
 
         //序列化body的长度和主体
@@ -101,10 +117,18 @@ public class Output {
         //标记为PROPERTIS_START
         DefaultKeyValue properties = (DefaultKeyValue) bytesMessage.properties();
         outPut.put(PROPERTIS_START);
-
         //序列化其中的map
         Map<String, Object> map = properties.getMap();
         mapToBytes(map);
+        outPut.force();
+    }
+
+    public void reMap() throws IOException {
+        int position = outPut.position();
+        this.outPut = memoryMappedFile.getChannel().map
+                (FileChannel.MapMode.READ_WRITE,
+                        position,
+                        position + mappedSize);//TODO：映射区的大小
     }
 
 
@@ -133,12 +157,12 @@ public class Output {
     }
 
 
-    private  void stringToBytes(String s) {
+    private void stringToBytes(String s) {
         intToBytes(s.length());
         outPut.put(s.getBytes());
     }
 
-    private  void mapToBytes(Map<String, Object> map) {
+    private void mapToBytes(Map<String, Object> map) {
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             //说明这是属性
             outPut.put(IS_PROPERTY_FIELD);

@@ -20,9 +20,19 @@ public class Input {
     private RandomAccessFile memoryMappedFile;
     private MappedByteBuffer input;
 
-    public Input(String fileName, int size) throws IOException {
+    public Input(String fileName) throws IOException {
         memoryMappedFile = new RandomAccessFile(fileName, "rw");
-        input = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, size + 1);
+        if (memoryMappedFile.length() > Integer.MAX_VALUE) {
+            input = memoryMappedFile.getChannel().map(
+                    FileChannel.MapMode.READ_ONLY,
+                    0,
+                    Integer.MAX_VALUE);
+        } else {
+            input = memoryMappedFile.getChannel().map(
+                    FileChannel.MapMode.READ_ONLY,
+                    0,
+                    memoryMappedFile.length());
+        }
     }
 
     private byte[] getBytes(int length) {
@@ -33,7 +43,7 @@ public class Input {
         return bytes;
     }
 
-    public Message readMessage() {
+    public Message readMessage(int position) {
         if (input.get(position) != MESSAGESTART) {
             return null;
         }
@@ -44,30 +54,46 @@ public class Input {
         int bodyLength = input.getInt(position);
         position += 4;
 
-        byte[] bytes = getBytes(bodyLength);
+
+        byte[] bytes = new byte[bodyLength];
+        for (int i = 0; i < bodyLength; i++) {
+            bytes[i] = input.get(position++);
+        }
         bytesMessage.setBody(bytes);
 
         byte headerNum;
         while ((headerNum = input.get(position++)) != PROPERTIS_START) {
             //TODO:添加更多的判断，出现频率最高的if-else放在最前面
             if (headerNum == TOPIC) {
+
                 int length = input.get(position);
                 position += 4;
-                bytes = getBytes(length);
+
+                bytes = new byte[length];
+                for (int i = 0; i < length; i++) {
+                    bytes[i] = input.get(position++);
+                }
+                bytesMessage.setBody(bytes);
+
                 String s = new String(bytes);
-                System.out.println("TOPIC:" + s);
                 bytesMessage.putHeaders(MessageHeader.TOPIC, s);
             } else if (headerNum == QUEUE) {
+
                 int length = input.getInt(position);
                 position += 4;
-                bytes = getBytes(length);
-                String s = new String(bytes);
 
+                bytes = new byte[length];
+                for (int i = 0; i < length; i++) {
+                    bytes[i] = input.get(position++);
+                }
+                bytesMessage.setBody(bytes);
+
+                String s = new String(bytes);
                 bytesMessage.putHeaders(MessageHeader.QUEUE, s);
             } else if (headerNum == MESSAGE_ID) {
+
                 long messageId = input.getLong(position);
                 position += 8;
-
                 bytesMessage.putHeaders(MessageHeader.MESSAGE_ID, messageId);
             } else {
                 System.out.println("未定义的消息头");//TODO:抛异常
@@ -96,7 +122,7 @@ public class Input {
                 bytesMessage.putProperties(fieName, value);
             } else if (type == STRING) {
                 int valueLength = input.getInt(position);
-                position+=4;
+                position += 4;
 
                 bytes = getBytes(valueLength);
                 String valueS = new String(bytes);

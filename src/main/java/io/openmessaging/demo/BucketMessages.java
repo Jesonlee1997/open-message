@@ -18,15 +18,8 @@ public class BucketMessages {
     private Map<String, Integer> offsetMap;
     private Map<Integer, Integer> offsetNumMap= new TreeMap<>();
 
-    public Message pullMessage(String queue) {
-        Integer offset = offsetMap.get(queue);
-        if (offset == null) {
-            offsetMap.put(queue, 1);
-            return messages.get(0);
-        }
-        Message message = messages.get(offset);
-        offsetMap.put(queue, ++offset);
-        return message;
+    public Message pullMessage(Thread queue) {
+        return null;
     }
 
 

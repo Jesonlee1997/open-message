@@ -10,7 +10,6 @@ public class MessageStoreTest {
     MessageStore messageStore = MessageStore.getInstance();
     @Test
     public void init() throws Exception {
-        messageStore.init();
     }
 
     @Test

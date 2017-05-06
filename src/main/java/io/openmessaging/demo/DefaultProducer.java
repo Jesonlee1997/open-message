@@ -2,6 +2,8 @@ package io.openmessaging.demo;
 
 import io.openmessaging.*;
 
+import java.io.IOException;
+
 public class DefaultProducer  implements Producer {
     private MessageStore messageStore = MessageStore.getInstance();
 
@@ -43,7 +45,11 @@ public class DefaultProducer  implements Producer {
 
     @Override
     public void send(Message message) {
-        messageStore.putMessage(message);
+        try {
+            messageStore.putMessage(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
