@@ -49,7 +49,7 @@ kill Producer进程，另取进程进行消费
 对Propertis进行序列化  
 
 二进制协议设计  
-![image](https://github.com/Jesonlee1997/open-message/raw/master/src/main/resources/序列化协议.png)
+![image](https://github.com/Jesonlee1997/open-message/raw/master/序列化协议.png)
 消息头编号100 用来判断消息的开始  
 消息主体长度就是body的size  
 消息主体之间与Headers之间没有间隔，body之后立即就是消息的Headers中的字段。  
