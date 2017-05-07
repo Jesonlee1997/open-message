@@ -11,7 +11,7 @@ BytesMessage createBytesMessageToQueue(String queue, byte[] body);
 void send(Message message);  
 
 
-————PullConsumer需要实现————
+————PullConsumer需要实现————  
 绑定到一个Queue，并订阅topics，即从这些topic读取消息，绑定到这个Queue后，只能从这个
 void attachQueue(String queueName, Collection<String> topics);
 
@@ -20,7 +20,7 @@ void attachQueue(String queueName, Collection<String> topics);
 Message poll();
 
 
-————测试流程————
+————测试流程————  
 创建Topic，创建Queue
 创意Producer，Producer创建指定Topic和指定Queue的Message，调用send发送  
 
@@ -49,7 +49,7 @@ kill Producer进程，另取进程进行消费
 对Propertis进行序列化  
 
 二进制协议设计  
-![image](https://github.com/Jesonlee1997/open-message/raw/master/序列化协议.png)
+![image](https://github.com/Jesonlee1997/open-message/raw/dev2/序列化协议.png)
 消息头编号100 用来判断消息的开始  
 消息主体长度就是body的size  
 消息主体之间与Headers之间没有间隔，body之后立即就是消息的Headers中的字段。  
