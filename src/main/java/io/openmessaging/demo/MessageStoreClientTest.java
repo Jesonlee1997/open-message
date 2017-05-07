@@ -11,7 +11,7 @@ public class MessageStoreClientTest {
 
     @Test
     public void load() throws Exception {
-        messageStoreClient.load("QUEUE1");
+
     }
 
 }

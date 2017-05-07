@@ -28,6 +28,14 @@ public class MessageStoreClient {
     //用queue来标识线程
     public Message pullMessage(String queue, String bucket) {
         BucketMessages bucketMessages = store.get(bucket);
+        if (bucketMessages == null) {
+            synchronized (store) {
+                if (store.get(bucket) == null) {
+                    bucketMessages = new BucketMessages(bucket);
+                    store.put(bucket, bucketMessages);
+                }
+            }
+        }
         return bucketMessages.pullMessage(Thread.currentThread());
     }
 

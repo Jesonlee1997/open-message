@@ -9,10 +9,9 @@ import io.openmessaging.demo.Input;
 import io.openmessaging.demo.Output;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,5 +94,14 @@ public class TestInputOutput {
         long end = System.currentTimeMillis();
         System.out.println(end - start);
         System.out.println("读取的消息数：" + messages.size());
+    }
+
+    @Test
+    public void test2() throws IOException {
+        String file = STORE_PATH+"QUEUE_0";
+        RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+        MappedByteBuffer mappedByteBuffer = randomAccessFile.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, randomAccessFile.length()/2 + 1);
+        MappedByteBuffer mappedByteBuffer1 = randomAccessFile.getChannel().map(FileChannel.MapMode.READ_WRITE, randomAccessFile.length()/2 + 1, randomAccessFile.length() + 1);
+        System.out.println();
     }
 }

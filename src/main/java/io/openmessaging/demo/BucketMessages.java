@@ -17,11 +17,12 @@ public class BucketMessages {
     private List<Message> messages = new ArrayList<>();
     private Map<String, Integer> offsetMap;
     private Map<Integer, Integer> offsetNumMap= new TreeMap<>();
+    //TODO:实现
 
-    public Message pullMessage(Thread queue) {
+    public Message pullMessage(Thread thread) {
         return null;
     }
 
-
-
+    public BucketMessages(String bucket) {
+    }
 }
