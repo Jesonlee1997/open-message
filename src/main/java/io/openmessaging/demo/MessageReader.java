@@ -19,7 +19,7 @@ import static io.openmessaging.demo.serialize.Constants.*;
  */
 public class MessageReader {
     private RandomAccessFile memoryMappedFile;
-    private static final int MAPPED_SIZE = 64 * 1024;
+    private static final long MAPPED_SIZE = 128 * 1024;//表示一次映射的字节数
     private static final int CORDON = 1024;//buffer的警戒线，预防Buffer满上
     private MappedByteBuffer buffer;//初始的buffer
     private final Map<Thread, Input> readers = new HashMap<>();
@@ -54,16 +54,14 @@ public class MessageReader {
 
     public Message readMessage() {
         Thread thread = Thread.currentThread();
-        Input input = readers.get(thread);
-        if (input == null) {
+        if (readers.get(thread) == null) {
             synchronized (readers) {
-                input = new Input(buffer, work);
                 if (readers.get(thread) == null) {
-                    readers.put(thread, input);
+                    readers.put(thread, new Input(buffer, work));
                 }
             }
         }
-        return input.readMessage();
+        return readers.get(thread).readMessage();
     }
 
     public void close() throws IOException {
@@ -127,7 +125,12 @@ public class MessageReader {
             //序列化body
             byte[] bytes = new byte[bodyLength];
             for (int i = 0; i < bodyLength; i++) {
-                bytes[i] = mappedByteBuffer.get(position++);
+                try {
+                    bytes[i] = mappedByteBuffer.get(position++);
+                } catch (Exception e) {
+                    System.out.println();
+                    e.printStackTrace();
+                }
             }
             bytesMessage.setBody(bytes);
             //序列化Headers
@@ -152,7 +155,12 @@ public class MessageReader {
 
                     bytes = new byte[length];
                     for (int i = 0; i < length; i++) {
-                        bytes[i] = mappedByteBuffer.get(position++);
+                        try {
+                            bytes[i] = mappedByteBuffer.get(position++);
+                        } catch (Exception e) {
+                            System.out.println(startPosition);
+                        }
+
                     }
                     String s = new String(bytes);
 
@@ -164,6 +172,8 @@ public class MessageReader {
                     bytesMessage.putHeaders(MessageHeader.MESSAGE_ID, messageId);
                 } else {
                     System.out.println("未定义的消息头");//TODO:抛异常
+                    System.out.println(position);
+                    System.out.println(startPosition);
                 }
             }
 

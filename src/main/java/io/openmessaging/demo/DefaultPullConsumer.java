@@ -65,6 +65,9 @@ public class DefaultPullConsumer implements PullConsumer {
     public void attachQueue(String queueName, Collection<String> topics) {
         queue = queueName;
         bucketList.add(queue);
-        bucketList.addAll(topics);
+        if (topics != null) {
+            bucketList.addAll(topics);
+        }
+
     }
 }

@@ -14,28 +14,30 @@ import static io.openmessaging.demo.serialize.Constants.*;
 
 /**
  * Created by JesonLee
+ * OutPut和文件是一对一的关系
  * on 2017/5/5.
  */
 public class Output {
     private final RandomAccessFile memoryMappedFile;
-    private MappedByteBuffer outPut;
+    private MappedByteBuffer writer;
     private int mappedSize;
-    private static final int DEFAULT_MAPPEDSIZE = 64 * 1024;
+    private static final int DEFAULT_MAPPEDSIZE = 16 * 1024 * 1024;
+    private long start = 0;
 
     public Output(String fileName) throws IOException {
         memoryMappedFile = new RandomAccessFile(fileName, "rw");
         mappedSize = DEFAULT_MAPPEDSIZE;
-        outPut = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, mappedSize);
+        writer = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, mappedSize);
     }
 
     public Output(String fileName, int mappedSize) throws IOException {
         memoryMappedFile = new RandomAccessFile(fileName, "rw");
         this.mappedSize = mappedSize;
-        outPut = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, this.mappedSize);
+        writer = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, this.mappedSize);
     }
 
     public void writeMessage(BytesMessage bytesMessage) {
-        if (outPut.position() >= (mappedSize - 1024)) {
+        if (writer.position() >= (mappedSize - 1024)) {
             try {
                 reMap();
             } catch (IOException e) {
@@ -43,12 +45,12 @@ public class Output {
             }
         }
 
-        outPut.put(MESSAGESTART);
+        writer.put(MESSAGESTART);
 
         //序列化body的长度和主体
         byte[] data = bytesMessage.getBody();
         intToBytes(data.length);
-        outPut.put(data);
+        writer.put(data);
 
         //对Headers进行序列化
         KeyValue headers = bytesMessage.headers();
@@ -58,7 +60,7 @@ public class Output {
             if (b > 10) {
                 System.out.println();//TODO:remove
             }
-            outPut.put(b);
+            writer.put(b);
             switch (b) {
                 //针对不同的键，采用不同的序列化策略
                 case TOPIC:
@@ -118,39 +120,40 @@ public class Output {
 
         //标记为PROPERTIS_START
         DefaultKeyValue properties = (DefaultKeyValue) bytesMessage.properties();
-        outPut.put(PROPERTIS_START);
+        writer.put(PROPERTIS_START);
         //序列化其中的map
         Map<String, Object> map = properties.getMap();
         mapToBytes(map);
     }
 
     public void reMap() throws IOException {
-        int position = outPut.position();
-        this.outPut = memoryMappedFile.getChannel().map
+        int position = writer.position();
+        start = start + position;
+        this.writer = memoryMappedFile.getChannel().map
                 (FileChannel.MapMode.READ_WRITE,
-                        position,
-                        position + mappedSize);//TODO：映射区的大小
+                        start,
+                        mappedSize);//TODO：映射区的大小
     }
 
 
     private void intToBytes(int value) {
         //由高位到低位
-        outPut.put((byte) (value >>> 24));
-        outPut.put((byte) (value >>> 16));
-        outPut.put((byte) (value >>> 8));
-        outPut.put((byte) value);
+        writer.put((byte) (value >>> 24));
+        writer.put((byte) (value >>> 16));
+        writer.put((byte) (value >>> 8));
+        writer.put((byte) value);
     }
 
 
     private void longToBytes(long num) {
-        outPut.put((byte) (num >>> 56));// 取最高8位放到0下标
-        outPut.put((byte) (num >>> 48));// 取最高8位放到0下标
-        outPut.put((byte) (num >>> 40));// 取最高8位放到0下标
-        outPut.put((byte) (num >>> 32));// 取最高8位放到0下标
-        outPut.put((byte) (num >>> 24));// 取最高8位放到0下标
-        outPut.put((byte) (num >>> 16));// 取次高8为放到1下标
-        outPut.put((byte) (num >>> 8)); // 取次低8位放到2下标
-        outPut.put((byte) (num)); // 取最低8位放到3下标
+        writer.put((byte) (num >>> 56));// 取最高8位放到0下标
+        writer.put((byte) (num >>> 48));// 取最高8位放到0下标
+        writer.put((byte) (num >>> 40));// 取最高8位放到0下标
+        writer.put((byte) (num >>> 32));// 取最高8位放到0下标
+        writer.put((byte) (num >>> 24));// 取最高8位放到0下标
+        writer.put((byte) (num >>> 16));// 取次高8为放到1下标
+        writer.put((byte) (num >>> 8)); // 取次低8位放到2下标
+        writer.put((byte) (num)); // 取最低8位放到3下标
     }
 
     private void doubleToBytes(double num) {
@@ -160,13 +163,13 @@ public class Output {
 
     private void stringToBytes(String s) {
         intToBytes(s.length());
-        outPut.put(s.getBytes());
+        writer.put(s.getBytes());
     }
 
     private void mapToBytes(Map<String, Object> map) {
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             //说明这是属性
-            outPut.put(IS_PROPERTY_FIELD);
+            writer.put(IS_PROPERTY_FIELD);
 
             String fieldName = entry.getKey();
             //写入键
@@ -174,19 +177,19 @@ public class Output {
             Object fieldValue = entry.getValue();
             if (fieldValue instanceof Integer) {
                 int i = (int) fieldValue;
-                outPut.put(INT);
+                writer.put(INT);
                 intToBytes(i);
             } else if (fieldValue instanceof Long) {
                 long l = (long) fieldValue;
-                outPut.put(LONG);
+                writer.put(LONG);
                 longToBytes(l);
             } else if (fieldValue instanceof Double) {
                 double d = (double) fieldValue;
-                outPut.put(DOUBLE);
+                writer.put(DOUBLE);
                 doubleToBytes(d);
             } else {
                 String s = (String) fieldValue;
-                outPut.put(STRING);
+                writer.put(STRING);
                 stringToBytes(s);
             }
         }

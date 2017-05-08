@@ -21,7 +21,7 @@ public class Buffer {
     private int bufferSize = 500;
     private final BytesMessage[] messageBuffer = new BytesMessage[bufferSize];
     Queue<Message> queue = new ConcurrentLinkedQueue<>();
-    private Output output;
+    private final Output output;
     private final byte[] lock = new byte[0];
     public void add(Message message) throws IOException {
         /*if (position.incrementAndGet() >= bufferSize) {
@@ -37,7 +37,7 @@ public class Buffer {
         }
         messageBuffer[position.get()-1] = (BytesMessage) message;*/
 
-        synchronized (this) {
+        synchronized (output) {
             output.writeMessage((BytesMessage) message);
         }
         //messageBuffer[position.getAndIncrement()] = (BytesMessage) message;

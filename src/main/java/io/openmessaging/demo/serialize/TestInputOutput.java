@@ -31,57 +31,33 @@ public class TestInputOutput {
     @Test //测试Mmap序列化
     public void testOutput() throws IOException {
 
-        Output output = new Output(fileName, 10 * 1024 * 1024);
-        BytesMessage[] messages = new BytesMessage[messageNumber];
+        Output outputTopic = new Output(fileName);
+        //Output outputQueue = new Output(fileName2, 10 * 1024 * 1024);
+        BytesMessage[] messagesTopic = new BytesMessage[messageNumber];
+        BytesMessage[] messagesQueue = new BytesMessage[messageNumber];
         for (int i = 0; i < messageNumber; i++) {
-            BytesMessage message = messageFactory.createBytesMessageToTopic("topic", "sfsdfa".getBytes());
+            BytesMessage message = messageFactory.createBytesMessageToTopic("topic", ("PRODUCER_1_" + i).getBytes());
             message.putHeaders(MessageHeader.MESSAGE_ID, 13424321L);
-            message.putProperties("pro1--"+i, 1331);
-            message.putProperties("pro2--"+i, 1324.31);
-            message.putProperties("pro3--"+i, "sdfhkajshdf");
-            messages[i] = message;
+            message.putProperties("pro"+i, i);
+
+            messagesTopic[i] = message;
         }
         long start = System.currentTimeMillis();
 
-        for (BytesMessage message : messages) {
-            output.writeMessage(message);
+        for (int i = 0; i < messageNumber; i++) {
+            outputTopic.writeMessage(messagesTopic[i]);
         }
 
         long end = System.currentTimeMillis();
         System.out.println(end - start);
     }
 
-    @Test//测试原生序列化
-    public void testOutPut2() throws IOException {
-        File file = new File(fileName);
-        if (file.exists()) {
-            file.delete();
-        }
-        file.createNewFile();
-        ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
-        BytesMessage[] messages = new BytesMessage[messageNumber];
-        for (int i = 0; i < messageNumber; i++) {
-            BytesMessage message = messageFactory.createBytesMessageToTopic("topic", "Preswfr_231".getBytes());
-            message.putHeaders(MessageHeader.MESSAGE_ID, 13424321L);
-            message.putProperties("pro1--"+i, 1331);
-            message.putProperties("pro2--"+i, 1324.31);
-            message.putProperties("pro3--"+i, "sdfhkajshdf");
-            messages[i] = message;
-        }
-        long start = System.currentTimeMillis();
 
-        for (BytesMessage message : messages) {
-            outputStream.writeObject(message);
-        }
-
-        long end = System.currentTimeMillis();
-        System.out.println(end - start);
-    }
 
     @Test //测试反序列化
     public void testInput() throws IOException {
         long start = System.currentTimeMillis();
-        MessageReader messageReader = new MessageReader(STORE_PATH + "/" + "QUEUE_1");
+        MessageReader messageReader = new MessageReader(fileName);
         List<Message> messages = new ArrayList<>(messageNumber);
         while (true) {
             Message message = messageReader.readMessage();
@@ -96,6 +72,34 @@ public class TestInputOutput {
         System.out.println("读取的消息数：" + messages.size());
     }
 
+    @Test//测试原生序列化
+    public void testOutPut2() throws IOException {
+        File file = new File(fileName);
+        if (file.exists()) {
+            file.delete();
+        }
+        file.createNewFile();
+        ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
+        BytesMessage[] messages = new BytesMessage[messageNumber];
+        for (int i = 0; i < messageNumber; i++) {
+            BytesMessage message = messageFactory.createBytesMessageToTopic("topic", "Preswfr_231".getBytes());
+            message.putHeaders(MessageHeader.MESSAGE_ID, 13424321L);
+
+            /*message.putProperties("pro1--"+i, 1331);
+            message.putProperties("pro2--"+i, 1324.31);
+            message.putProperties("pro3--"+i, "sdfhkajshdf");*/
+            messages[i] = message;
+        }
+        long start = System.currentTimeMillis();
+
+        for (BytesMessage message : messages) {
+            outputStream.writeObject(message);
+        }
+
+        long end = System.currentTimeMillis();
+        System.out.println(end - start);
+    }
+
     @Test
     public void test2() throws IOException {
 
@@ -106,7 +110,6 @@ public class TestInputOutput {
         long start = System.currentTimeMillis();
         for (int i = 0; i < 100; i++) {
             mappedByteBuffer = randomAccessFile.getChannel().map(FileChannel.MapMode.READ_ONLY, (i)*1024*1024, (i+1) * 1024 * 1024);
-
         }
         long end = System.currentTimeMillis();
         System.out.println(end - start);
