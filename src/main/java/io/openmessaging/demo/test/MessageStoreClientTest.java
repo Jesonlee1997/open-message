@@ -1,5 +1,6 @@
-package io.openmessaging.demo;
+package io.openmessaging.demo.test;
 
+import io.openmessaging.demo.MessageStoreClient;
 import org.junit.Test;
 
 /**

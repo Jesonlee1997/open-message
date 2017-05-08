@@ -10,7 +10,6 @@ public class DefaultPullConsumer implements PullConsumer {
     private MessageStoreClient messageStore = MessageStoreClient.getInstance();
     private KeyValue properties;
     private String queue;
-    private Set<String> buckets = new HashSet<>();
     private List<String> bucketList = new ArrayList<>();
 
     private int lastIndex = 0;
@@ -28,7 +27,7 @@ public class DefaultPullConsumer implements PullConsumer {
 
     @Override
     public Message poll() {
-        if (buckets.size() == 0 || queue == null) {
+        if (bucketList.size() == 0 || queue == null) {
             return null;
         }
         //use Round Robin
@@ -36,9 +35,12 @@ public class DefaultPullConsumer implements PullConsumer {
         while (++checkNum <= bucketList.size()) {
             //轮询获得topic或List
             String bucket = bucketList.get((++lastIndex) % (bucketList.size()));
-            Message message = messageStore.pullMessage(queue, bucket);
+            Message message = messageStore.pullMessage(bucket);
             if (message != null) {
                 return message;
+            } else {
+                bucketList.remove(bucket);
+                checkNum--;
             }
         }
         return null;
@@ -63,7 +65,7 @@ public class DefaultPullConsumer implements PullConsumer {
     //将线程绑定到一个队列和多个topic
     public void attachQueue(String queueName, Collection<String> topics) {
         queue = queueName;
-        buckets.addAll(topics);
-        bucketList.addAll(buckets);
+        bucketList.add(queue);
+        bucketList.addAll(topics);
     }
 }

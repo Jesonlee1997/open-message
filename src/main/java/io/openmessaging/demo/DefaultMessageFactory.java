@@ -3,6 +3,7 @@ package io.openmessaging.demo;
 import io.openmessaging.BytesMessage;
 import io.openmessaging.MessageFactory;
 import io.openmessaging.MessageHeader;
+import io.openmessaging.demo.DefaultBytesMessage;
 
 /**
  * Created by JesonLee

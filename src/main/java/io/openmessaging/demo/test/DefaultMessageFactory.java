@@ -17,6 +17,7 @@ public class DefaultMessageFactory implements MessageFactory {
         return defaultBytesMessage;
     }
 
+
     @Override public BytesMessage createBytesMessageToQueue(String queue, byte[] body) {
         DefaultBytesMessage defaultBytesMessage = new DefaultBytesMessage(body);
         defaultBytesMessage.putHeaders(MessageHeader.QUEUE, queue);

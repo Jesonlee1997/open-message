@@ -1,6 +1,9 @@
-package io.openmessaging.demo;
+package io.openmessaging.tester;
 
 import io.openmessaging.*;
+import io.openmessaging.demo.DefaultKeyValue;
+import io.openmessaging.demo.DefaultProducer;
+import io.openmessaging.demo.DefaultPullConsumer;
 import org.junit.Assert;
 
 import java.util.ArrayList;

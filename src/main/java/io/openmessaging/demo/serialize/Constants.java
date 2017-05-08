@@ -34,7 +34,6 @@ public class Constants {
     public static final byte LONG = 2;
     public static final byte DOUBLE = 4;
     public static final byte STRING = 8;
-    public static final int MESSAGE_NUM = 10000;
 
     public static final Map<String, Byte> HEADERS = new HashMap<String, Byte>(20) {{
         put("MessageId", MESSAGE_ID);

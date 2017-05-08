@@ -45,7 +45,7 @@ public class Buffer {
     }
 
 
-    Buffer(String bucket) throws IOException {
+    public Buffer(String bucket) throws IOException {
         output = new Output(STORE_PATH+bucket);
     }
 }

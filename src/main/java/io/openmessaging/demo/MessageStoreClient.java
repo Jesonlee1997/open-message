@@ -5,8 +5,6 @@ import io.openmessaging.Message;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static io.openmessaging.tester.Constants.STORE_PATH;
-
 /**
  * Created by JesonLee
  * on 2017/4/20.
@@ -18,25 +16,22 @@ public class MessageStoreClient {
         return INSTANCE;
     }
 
-    //
-    private final String basePath = STORE_PATH;
-
     //存放bucket到消息列表的映射
-    private final Map<String, BucketMessages> store = new ConcurrentHashMap<>();
+    private final Map<String, MessageReader> store = new ConcurrentHashMap<>();
 
 
     //用queue来标识线程
-    public Message pullMessage(String queue, String bucket) {
-        BucketMessages bucketMessages = store.get(bucket);
-        if (bucketMessages == null) {
+    public Message pullMessage(String bucket) {
+        MessageReader messageReader = store.get(bucket);
+        if (messageReader == null) {
             synchronized (store) {
                 if (store.get(bucket) == null) {
-                    bucketMessages = new BucketMessages(bucket);
-                    store.put(bucket, bucketMessages);
+                    messageReader = new MessageReader(bucket);
+                    store.put(bucket, messageReader);
                 }
             }
         }
-        return bucketMessages.pullMessage(Thread.currentThread());
+        return messageReader.readMessage();
     }
 
 }
