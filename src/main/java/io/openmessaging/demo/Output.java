@@ -20,7 +20,7 @@ public class Output {
     private final RandomAccessFile memoryMappedFile;
     private MappedByteBuffer outPut;
     private int mappedSize;
-    private static final int DEFAULT_MAPPEDSIZE = 16 * 1024 * 1024;
+    private static final int DEFAULT_MAPPEDSIZE = 64 * 1024;
 
     public Output(String fileName) throws IOException {
         memoryMappedFile = new RandomAccessFile(fileName, "rw");
@@ -47,7 +47,6 @@ public class Output {
 
         //序列化body的长度和主体
         byte[] data = bytesMessage.getBody();
-        //outPut.putInt(data.length);
         intToBytes(data.length);
         outPut.put(data);
 
@@ -56,6 +55,9 @@ public class Output {
         Set<String> set = headers.keySet();
         for (String s : set) {
             Byte b = HEADERS.get(s);
+            if (b > 10) {
+                System.out.println();//TODO:remove
+            }
             outPut.put(b);
             switch (b) {
                 //针对不同的键，采用不同的序列化策略
@@ -120,7 +122,6 @@ public class Output {
         //序列化其中的map
         Map<String, Object> map = properties.getMap();
         mapToBytes(map);
-        outPut.force();
     }
 
     public void reMap() throws IOException {

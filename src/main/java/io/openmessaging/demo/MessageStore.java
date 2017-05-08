@@ -17,7 +17,7 @@ public class MessageStore {
 
     private static final String basePath = Constants.STORE_PATH;
 
-    //TODO:使用策略，在内存中维护一个容量为500的buffer，每当buffer满了之后，就向磁盘写入消息
+    //每个bucket都对应一个Buffer，Buffer利用mmap直接向程序中写入
     private final Map<String, Buffer> bucketMaps = new ConcurrentHashMap<>();
 
     public static MessageStore getInstance() {
@@ -26,13 +26,17 @@ public class MessageStore {
 
     public void putMessage(Message message) throws IOException {
         String bucket = getBucket(message);
-        Buffer buffer = bucketMaps.get(bucket);
-        if (buffer == null) {//TODO:线程安全？
+        if (bucketMaps.get(bucket) == null) {//TODO:线程安全？
             //不管这个bucket是否存在，Buffer都会创建一个文件mmap到内存中
-            buffer = new Buffer(bucket);
-            bucketMaps.put(bucket, buffer);
+            synchronized (bucketMaps) {
+                if (bucketMaps.get(bucket) == null) {
+                    bucketMaps.put(bucket, new Buffer(bucket));
+                }
+            }
+
         }
-        buffer.add(message);
+
+        bucketMaps.get(bucket).add(message);
     }
 
     private String getBucket(Message message) {

@@ -23,18 +23,18 @@ import static io.openmessaging.tester.Constants.STORE_PATH;
  */
 public class TestInputOutput {
 
-    private String fileName = "J:\\Github\\openmessagingdemotester\\src\\main\\java\\io\\openmessaging\\demo\\serialize\\largeFile.txt";
+    private String fileName = STORE_PATH + "/" + "test";
     private MessageFactory messageFactory = new DefaultMessageFactory();
-    private int messageNumber = 10000;
+    private int messageNumber = 100000;
 
 
     @Test //测试Mmap序列化
     public void testOutput() throws IOException {
 
-        Output output = new Output(fileName, messageNumber * 100);
+        Output output = new Output(fileName, 10 * 1024 * 1024);
         BytesMessage[] messages = new BytesMessage[messageNumber];
         for (int i = 0; i < messageNumber; i++) {
-            BytesMessage message = messageFactory.createBytesMessageToQueue("queue", "sfsdfa".getBytes());
+            BytesMessage message = messageFactory.createBytesMessageToTopic("topic", "sfsdfa".getBytes());
             message.putHeaders(MessageHeader.MESSAGE_ID, 13424321L);
             message.putProperties("pro1--"+i, 1331);
             message.putProperties("pro2--"+i, 1324.31);
@@ -61,7 +61,7 @@ public class TestInputOutput {
         ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
         BytesMessage[] messages = new BytesMessage[messageNumber];
         for (int i = 0; i < messageNumber; i++) {
-            BytesMessage message = messageFactory.createBytesMessageToQueue("queue", "sfsdfa".getBytes());
+            BytesMessage message = messageFactory.createBytesMessageToTopic("topic", "Preswfr_231".getBytes());
             message.putHeaders(MessageHeader.MESSAGE_ID, 13424321L);
             message.putProperties("pro1--"+i, 1331);
             message.putProperties("pro2--"+i, 1324.31);
@@ -81,7 +81,7 @@ public class TestInputOutput {
     @Test //测试反序列化
     public void testInput() throws IOException {
         long start = System.currentTimeMillis();
-        MessageReader messageReader = new MessageReader(STORE_PATH + "TOPIC_4");
+        MessageReader messageReader = new MessageReader(STORE_PATH + "/" + "QUEUE_1");
         List<Message> messages = new ArrayList<>(messageNumber);
         while (true) {
             Message message = messageReader.readMessage();

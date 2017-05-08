@@ -70,22 +70,6 @@ public class DefaultKeyValue implements KeyValue, Serializable {
     }
 
 
-
-    /*@Override //TODO:迭代器模式
-    public Iterator iterator() {
-        return kvs.entrySet().iterator();
-    }
-
-    @Override
-    public boolean hasNext() {
-        return false;
-    }
-
-    @Override
-    public Object next() {
-        return null;
-    }*/
-
     public Map<String, Object> getMap() {
         return kvs;
     }

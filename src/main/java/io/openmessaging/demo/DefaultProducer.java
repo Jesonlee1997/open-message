@@ -6,9 +6,10 @@ import java.io.IOException;
 
 public class DefaultProducer  implements Producer {
     private MessageStore messageStore = MessageStore.getInstance();
+    private KeyValue properties;
 
-    //TODO:添加属性值
     public DefaultProducer(KeyValue properties) {
+        this.properties = properties;
     }
 
     public DefaultProducer() {

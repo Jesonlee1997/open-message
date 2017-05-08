@@ -258,10 +258,6 @@ public class Consts {
         for (int i = 0; i < bytes.length; i++) {
             System.out.println(out.get(i));
         }
-        /*for (int i = 0; i < 10; i++) {
-            BytesMessage bytesMessage = defaultMessageFactory.createBytesMessageToQueue("queue1", "queue1".getBytes());
-            out.put(messageToBytes(bytesMessage));
-        }*/
 
     }
 }

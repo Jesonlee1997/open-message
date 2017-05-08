@@ -19,7 +19,8 @@ import static io.openmessaging.demo.serialize.Constants.*;
  */
 public class MessageReader {
     private RandomAccessFile memoryMappedFile;
-    private static final int MAPPED_SIZE = 4 * 1024 * 1024;
+    private static final int MAPPED_SIZE = 64 * 1024;
+    private static final int CORDON = 1024;//buffer的警戒线，预防Buffer满上
     private MappedByteBuffer buffer;//初始的buffer
     private final Map<Thread, Input> readers = new HashMap<>();
     private Work work;
@@ -29,6 +30,10 @@ public class MessageReader {
         try {
             memoryMappedFile = new RandomAccessFile(fileName, "rw");
             work = new Work(memoryMappedFile);
+            long length = memoryMappedFile.length();
+            if (length == 0) {
+                System.out.println(fileName + "不存在");//TODO：抛异常
+            }
             if (memoryMappedFile.length() > MAPPED_SIZE) {
                 buffer = memoryMappedFile.getChannel().map(
                         FileChannel.MapMode.READ_ONLY,
@@ -74,7 +79,6 @@ public class MessageReader {
 
         public MappedByteBuffer remap(long start) {
             try {
-                System.out.println("I am remap");
                 return  memoryMappedFile.getChannel().map(
                         FileChannel.MapMode.READ_ONLY,
                         start,
@@ -105,7 +109,7 @@ public class MessageReader {
         }
 
         public Message readMessage() {
-            if (MAPPED_SIZE - position <= 300) {
+            if (MAPPED_SIZE - position <= CORDON) {
                 startPosition = startPosition + position;
                 position = 0;
                 mappedByteBuffer = work.remap(startPosition);
@@ -126,22 +130,19 @@ public class MessageReader {
                 bytes[i] = mappedByteBuffer.get(position++);
             }
             bytesMessage.setBody(bytes);
-
             //序列化Headers
             byte headerNum;
             while ((headerNum = mappedByteBuffer.get(position++)) != PROPERTIS_START) {
                 //TODO:添加更多的判断，出现频率最高的if-else放在最前面
                 if (headerNum == TOPIC) {
 
-                    int length = mappedByteBuffer.get(position);
+                    int length = mappedByteBuffer.getInt(position);
                     position += 4;
 
                     bytes = new byte[length];
                     for (int i = 0; i < length; i++) {
                         bytes[i] = mappedByteBuffer.get(position++);
                     }
-                    bytesMessage.setBody(bytes);
-
                     String s = new String(bytes);
                     bytesMessage.putHeaders(MessageHeader.TOPIC, s);
                 } else if (headerNum == QUEUE) {
@@ -153,9 +154,8 @@ public class MessageReader {
                     for (int i = 0; i < length; i++) {
                         bytes[i] = mappedByteBuffer.get(position++);
                     }
-                    bytesMessage.setBody(bytes);
-
                     String s = new String(bytes);
+
                     bytesMessage.putHeaders(MessageHeader.QUEUE, s);
                 } else if (headerNum == MESSAGE_ID) {
 
@@ -194,7 +194,7 @@ public class MessageReader {
                     position += 4;
 
                     bytes = new byte[valueLength];
-                    for (int i = 0; i < length; i++) {
+                    for (int i = 0; i < valueLength; i++) {
                         bytes[i] = mappedByteBuffer.get(position++);
                     }
                     String valueS = new String(bytes);

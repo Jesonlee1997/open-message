@@ -14,7 +14,6 @@ public class DefaultPullConsumer implements PullConsumer {
 
     private int lastIndex = 0;
 
-    //TODO:添加属性
     public DefaultPullConsumer(KeyValue properties) {
         this.properties = properties;
     }
