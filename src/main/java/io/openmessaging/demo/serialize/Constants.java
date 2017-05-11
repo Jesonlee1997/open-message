@@ -8,6 +8,7 @@ import java.util.Map;
  * on 2017/5/3.
  */
 public class Constants {
+    //MessageHeader字段的编号
     public static final byte MESSAGE_ID = 1;
     public static final byte TOPIC = 2;
     public static final byte QUEUE = 3;
@@ -26,10 +27,12 @@ public class Constants {
     public static final byte SHARDING_PARTITION = 16;
     public static final byte TRACE_ID = 17;
 
+    //判断标识
     public static final byte MESSAGESTART = 100;
     public static final byte PROPERTIS_START = 101;
     public static final byte IS_PROPERTY_FIELD = 102;
 
+    //类型标识
     public static final byte INT = 1;
     public static final byte LONG = 2;
     public static final byte DOUBLE = 4;
@@ -39,20 +42,20 @@ public class Constants {
         put("MessageId", MESSAGE_ID);
         put("Topic", TOPIC);
         put("Queue", QUEUE);
+        put("BornTimestamp", BORN_TIMESTAMP);
+        put("BornHost", BORN_HOST);
+        put("StoreTimestamp", STORE_TIMESTAMP);
+        put("StoreHost", STORE_HOST);
+        put("StartTime", START_TIME);
+        put("StopTime", STOP_TIME);
+        put("Timeout", TIMEOUT);
+        put("Priority", PRIORITY);
+        put("Reliability", RELIABILITY);
+        put("SearchKey", SEARCH_KEY);
+        put("ScheduleExpression", SCHEDULE_EXPRESSION);
+        put("ShardingKey", SHARDING_KEY);
+        put("ShardingPartition", SHARDING_PARTITION);
+        put("TraceId", TRACE_ID);
     }};
-
-    public static final Map<Byte, String> HEADERS_MAP = new HashMap<Byte, String>() {{
-        put(MESSAGE_ID, "MessageId");
-        put(TOPIC, "Topic");
-        put(QUEUE, "Queue");
-    }};
-
-
-
-
-
-
-
-
 
 }

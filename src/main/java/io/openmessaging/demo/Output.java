@@ -57,9 +57,6 @@ public class Output {
         Set<String> set = headers.keySet();
         for (String s : set) {
             Byte b = HEADERS.get(s);
-            if (b > 10) {
-                System.out.println();//TODO:remove
-            }
             writer.put(b);
             switch (b) {
                 //针对不同的键，采用不同的序列化策略
@@ -70,19 +67,19 @@ public class Output {
                     stringToBytes(headers.getString(s));
                     break;
                 case MESSAGE_ID:
-                    longToBytes(headers.getLong(s));
+                    stringToBytes(headers.getString(s));
                     break;
                 case BORN_TIMESTAMP:
                     longToBytes(headers.getLong(s));
                     break;
                 case BORN_HOST:
-                    longToBytes(headers.getLong(s));
+                    stringToBytes(headers.getString(s));
                     break;
                 case STORE_TIMESTAMP:
                     longToBytes(headers.getLong(s));
                     break;
                 case STORE_HOST:
-                    longToBytes(headers.getLong(s));
+                    stringToBytes(headers.getString(s));
                     break;
                 case START_TIME:
                     longToBytes(headers.getLong(s));
@@ -91,28 +88,28 @@ public class Output {
                     longToBytes(headers.getLong(s));
                     break;
                 case TIMEOUT:
-                    longToBytes(headers.getLong(s));
+                    intToBytes(headers.getInt(s));
                     break;
                 case PRIORITY:
-                    longToBytes(headers.getLong(s));
+                    intToBytes(headers.getInt(s));
                     break;
                 case RELIABILITY:
-                    longToBytes(headers.getLong(s));
+                    intToBytes(headers.getInt(s));
                     break;
                 case SEARCH_KEY:
-                    longToBytes(headers.getLong(s));
+                    stringToBytes(headers.getString(s));
                     break;
                 case SCHEDULE_EXPRESSION:
-                    longToBytes(headers.getLong(s));
+                    stringToBytes(headers.getString(s));
                     break;
                 case SHARDING_KEY:
-                    longToBytes(headers.getLong(s));
+                    stringToBytes(headers.getString(s));
                     break;
                 case SHARDING_PARTITION:
-                    longToBytes(headers.getLong(s));
+                    stringToBytes(headers.getString(s));
                     break;
                 case TRACE_ID:
-                    longToBytes(headers.getLong(s));
+                    stringToBytes(headers.getString(s));
                     break;
 
             }
@@ -132,7 +129,7 @@ public class Output {
         this.writer = memoryMappedFile.getChannel().map
                 (FileChannel.MapMode.READ_WRITE,
                         start,
-                        mappedSize);//TODO：映射区的大小
+                        mappedSize);
     }
 
 
