@@ -7,10 +7,7 @@ import io.openmessaging.PullConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ConsumerTester {
@@ -104,8 +101,10 @@ public class ConsumerTester {
     public static void main(String[] args) throws Exception {
         Thread[] ts = new Thread[Constants.CON_NUM];
         for (int i = 0; i < ts.length; i++) {
-            ts[i] = new ConsumerTask(Constants.QUEUE_PRE + i,
-                Collections.singletonList(Constants.TOPIC_PRE + i));
+            List<String> topics = new ArrayList<>();
+            topics.add(Constants.TOPIC_PRE + i);
+            topics.add(Constants.TOPIC_PRE + (Constants.CON_NUM-i-1));
+            ts[i] = new ConsumerTask(Constants.QUEUE_PRE + i, topics);
         }
         long start = System.currentTimeMillis();
         for (int i = 0; i < ts.length; i++) {

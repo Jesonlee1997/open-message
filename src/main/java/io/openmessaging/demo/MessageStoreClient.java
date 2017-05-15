@@ -25,15 +25,13 @@ public class MessageStoreClient {
 
     //用queue来标识线程
     public Message pullMessage(String bucket) {
-        MessageReader messageReader = store.get(bucket);
-        if (messageReader == null) {
+        if (store.get(bucket) == null) {
             synchronized (store) {
                 if (store.get(bucket) == null) {
-                    messageReader = new MessageReader(STORE_PATH + "/" + bucket);
-                    store.put(bucket, messageReader);
+                    store.put(bucket, new MessageReader(STORE_PATH + "/" + bucket));
                 }
             }
         }
-        return messageReader.readMessage();
+        return store.get(bucket).readMessage();
     }
 }
