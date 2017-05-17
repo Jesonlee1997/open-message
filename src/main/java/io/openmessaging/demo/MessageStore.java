@@ -26,6 +26,7 @@ public class MessageStore {
 
     public void putMessage(Message message) throws IOException {
         String bucket = getBucket(message);
+
         if (bucketMaps.get(bucket) == null) {
             //不管这个bucket是否存在，Buffer都会创建一个文件mmap到内存中
             synchronized (bucketMaps) {

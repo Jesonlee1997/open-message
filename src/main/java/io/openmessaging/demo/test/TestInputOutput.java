@@ -1,4 +1,4 @@
-package io.openmessaging.demo.serialize;
+package io.openmessaging.demo.test;
 
 import io.openmessaging.BytesMessage;
 import io.openmessaging.Message;

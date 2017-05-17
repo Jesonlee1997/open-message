@@ -11,7 +11,7 @@ import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.openmessaging.demo.serialize.Constants.*;
+import static io.openmessaging.demo.CustomConstants.*;
 
 /**
  * Created by JesonLee
@@ -140,113 +140,96 @@ public class MessageReader {
             bytesMessage.setBody(bytes);
             //序列化Headers
             byte headerNum;
+
             while ((headerNum = mappedByteBuffer.get(position++)) != PROPERTIS_START) {
-                //TODO:添加更多的判断，出现频率最高的if-else放在最前面
-                if (headerNum == TOPIC) {
-
-                    int length = mappedByteBuffer.getInt(position);
-                    position += 4;
-
-                    bytesMessage.putHeaders(MessageHeader.TOPIC, getString(length));
-                } else if (headerNum == QUEUE) {
-
-                    int length = mappedByteBuffer.getInt(position);
-                    position += 4;
-
-                    bytesMessage.putHeaders(MessageHeader.QUEUE, getString(length));
-                } else if (headerNum == MESSAGE_ID) {
-
-                    int length = mappedByteBuffer.getInt(position);
-                    position += 4;
-
-                    bytesMessage.putHeaders(MessageHeader.MESSAGE_ID, getString(length));
-                } else if (headerNum == BORN_TIMESTAMP) {
-
-                    long l = mappedByteBuffer.getLong(position);
-                    position += 8;
-
-                    bytesMessage.putHeaders(MessageHeader.BORN_TIMESTAMP, l);
-                } else if (headerNum == BORN_HOST) {
-
-                    int length = mappedByteBuffer.getInt(position);
-                    position += 4;
-
-                    bytesMessage.putHeaders(MessageHeader.BORN_HOST, getString(length));
-                } else if (headerNum == STORE_TIMESTAMP) {
-
-                    long l = mappedByteBuffer.getLong(position);
-                    position += 8;
-
-                    bytesMessage.putHeaders(MessageHeader.STORE_TIMESTAMP, l);
-                } else if (headerNum == STORE_HOST) {
-
-                    int length = mappedByteBuffer.getInt(position);
-                    position += 4;
-
-                    bytesMessage.putHeaders(MessageHeader.STORE_HOST, getString(length));
-                } else if (headerNum == START_TIME) {
-
-                    long l = mappedByteBuffer.getLong(position);
-                    position += 8;
-
-                    bytesMessage.putHeaders(MessageHeader.START_TIME, l);
-                } else if (headerNum == STOP_TIME) {
-
-                    long l = mappedByteBuffer.getLong(position);
-                    position += 8;
-
-                    bytesMessage.putHeaders(MessageHeader.STOP_TIME, l);
-                } else if (headerNum == TIMEOUT) {
-
-                    int i = mappedByteBuffer.getInt(position);
-                    position+=4;
-
-                    bytesMessage.putHeaders(MessageHeader.TIMEOUT, i);
-                } else if (headerNum == PRIORITY) {
-
-                    int i = mappedByteBuffer.getInt(position);
-                    position+=4;
-
-                    bytesMessage.putHeaders(MessageHeader.PRIORITY, i);
-                } else if (headerNum == RELIABILITY) {
-
-                    int i = mappedByteBuffer.getInt(position);
-                    position+=4;
-
-                    bytesMessage.putHeaders(MessageHeader.RELIABILITY, i);
-                } else if (headerNum == SEARCH_KEY) {
-
-                    int length = mappedByteBuffer.getInt(position);
-                    position += 4;
-
-                    bytesMessage.putHeaders(MessageHeader.SEARCH_KEY, getString(length));
-                } else if (headerNum == SCHEDULE_EXPRESSION) {
-
-                    int length = mappedByteBuffer.getInt(position);
-                    position += 4;
-
-                    bytesMessage.putHeaders(MessageHeader.SCHEDULE_EXPRESSION, getString(length));
-                } else if (headerNum == SHARDING_KEY) {
-
-                    int length = mappedByteBuffer.getInt(position);
-                    position += 4;
-
-                    bytesMessage.putHeaders(MessageHeader.SHARDING_KEY, getString(length));
-                } else if (headerNum == SHARDING_PARTITION) {
-
-                    int length = mappedByteBuffer.getInt(position);
-                    position += 4;
-
-                    bytesMessage.putHeaders(MessageHeader.SHARDING_PARTITION, getString(length));
-                } else if (headerNum == TRACE_ID) {
-
-                    int length = mappedByteBuffer.getInt(position);
-                    position += 4;
-
-                    bytesMessage.putHeaders(MessageHeader.TRACE_ID, getString(length));
-                } else {
-                    //System.out.println("未定义的消息头");//TODO:抛异常
-                    return null;//这种情况可能是因为程序异常退出
+                switch (headerNum) {
+                    case TOPIC:
+                        int length = mappedByteBuffer.getInt(position);
+                        position += 4;
+                        bytesMessage.putHeaders(MessageHeader.TOPIC, getString(length));
+                        break;
+                    case QUEUE:
+                        length = mappedByteBuffer.getInt(position);
+                        position += 4;
+                        bytesMessage.putHeaders(MessageHeader.QUEUE, getString(length));
+                        break;
+                    case MESSAGE_ID:
+                        length = mappedByteBuffer.getInt(position);
+                        position += 4;
+                        bytesMessage.putHeaders(MessageHeader.MESSAGE_ID, getString(length));
+                        break;
+                    case BORN_TIMESTAMP:
+                        long l = mappedByteBuffer.getLong(position);
+                        position += 8;
+                        bytesMessage.putHeaders(MessageHeader.BORN_TIMESTAMP, l);
+                        break;
+                    case BORN_HOST:
+                        length = mappedByteBuffer.getInt(position);
+                        position += 4;
+                        bytesMessage.putHeaders(MessageHeader.BORN_HOST, getString(length));
+                        break;
+                    case STORE_TIMESTAMP:
+                        l = mappedByteBuffer.getLong(position);
+                        position += 8;
+                        bytesMessage.putHeaders(MessageHeader.STORE_TIMESTAMP, l);
+                        break;
+                    case STORE_HOST:
+                        length = mappedByteBuffer.getInt(position);
+                        position += 4;
+                        bytesMessage.putHeaders(MessageHeader.STORE_HOST, getString(length));
+                        break;
+                    case START_TIME:
+                        l = mappedByteBuffer.getLong(position);
+                        position += 8;
+                        bytesMessage.putHeaders(MessageHeader.START_TIME, l);
+                        break;
+                    case STOP_TIME:
+                        l = mappedByteBuffer.getLong(position);
+                        position += 8;
+                        bytesMessage.putHeaders(MessageHeader.STOP_TIME, l);
+                        break;
+                    case TIMEOUT:
+                        int i = mappedByteBuffer.getInt(position);
+                        position += 4;
+                        bytesMessage.putHeaders(MessageHeader.TIMEOUT, i);
+                        break;
+                    case PRIORITY:
+                        i = mappedByteBuffer.getInt(position);
+                        position += 4;
+                        bytesMessage.putHeaders(MessageHeader.PRIORITY, i);
+                        break;
+                    case RELIABILITY:
+                        i = mappedByteBuffer.getInt(position);
+                        position += 4;
+                        bytesMessage.putHeaders(MessageHeader.RELIABILITY, i);
+                        break;
+                    case SEARCH_KEY:
+                        length = mappedByteBuffer.getInt(position);
+                        position += 4;
+                        bytesMessage.putHeaders(MessageHeader.SEARCH_KEY, getString(length));
+                        break;
+                    case SCHEDULE_EXPRESSION:
+                        length = mappedByteBuffer.getInt(position);
+                        position += 4;
+                        bytesMessage.putHeaders(MessageHeader.SCHEDULE_EXPRESSION, getString(length));
+                        break;
+                    case SHARDING_KEY:
+                        length = mappedByteBuffer.getInt(position);
+                        position += 4;
+                        bytesMessage.putHeaders(MessageHeader.SHARDING_KEY, getString(length));
+                        break;
+                    case SHARDING_PARTITION:
+                        length = mappedByteBuffer.getInt(position);
+                        position += 4;
+                        bytesMessage.putHeaders(MessageHeader.SHARDING_PARTITION, getString(length));
+                        break;
+                    case TRACE_ID:
+                        length = mappedByteBuffer.getInt(position);
+                        position += 4;
+                        bytesMessage.putHeaders(MessageHeader.TRACE_ID, getString(length));
+                        break;
+                    default:
+                        return null;
                 }
             }
 
@@ -289,6 +272,7 @@ public class MessageReader {
             }
             return bytesMessage;
         }
-    }
-}
 
+    }
+
+}

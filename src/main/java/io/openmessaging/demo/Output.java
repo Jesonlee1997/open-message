@@ -10,7 +10,7 @@ import java.nio.channels.FileChannel;
 import java.util.Map;
 import java.util.Set;
 
-import static io.openmessaging.demo.serialize.Constants.*;
+import static io.openmessaging.demo.CustomConstants.*;
 
 /**
  * Created by JesonLee

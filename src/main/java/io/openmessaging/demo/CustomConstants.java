@@ -1,4 +1,4 @@
-package io.openmessaging.demo.serialize;
+package io.openmessaging.demo;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,7 +7,7 @@ import java.util.Map;
  * Created by JesonLee
  * on 2017/5/3.
  */
-public class Constants {
+public class CustomConstants {
     //MessageHeader字段的编号
     public static final byte MESSAGE_ID = 1;
     public static final byte TOPIC = 2;
