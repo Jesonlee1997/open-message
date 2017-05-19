@@ -2,7 +2,6 @@ package io.openmessaging.demo;
 
 import io.openmessaging.Message;
 import io.openmessaging.MessageHeader;
-import io.openmessaging.tester.Constants;
 
 import java.io.IOException;
 import java.util.Map;
@@ -15,10 +14,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MessageStore {
     private static final MessageStore INSTANCE = new MessageStore();
 
-    private static final String basePath = Constants.STORE_PATH;
-
     //每个bucket都对应一个Buffer，Buffer利用mmap直接向程序中写入
     private final Map<String, Buffer> bucketMaps = new ConcurrentHashMap<>();
+
+    public static String STORE_PATH;
 
     public static MessageStore getInstance() {
         return INSTANCE;
@@ -43,5 +42,9 @@ public class MessageStore {
         String topic = message.headers().getString(MessageHeader.TOPIC);
         String queue = message.headers().getString(MessageHeader.QUEUE);
         return topic != null ? topic : queue;
+    }
+
+    public void initPath(String path) {
+        STORE_PATH = path;
     }
 }

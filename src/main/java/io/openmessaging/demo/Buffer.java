@@ -5,7 +5,7 @@ import io.openmessaging.Message;
 
 import java.io.IOException;
 
-import static io.openmessaging.tester.Constants.STORE_PATH;
+
 
 /**
  * 一个线程对应一个缓冲区
@@ -24,6 +24,6 @@ public class Buffer {
 
 
     public Buffer(String bucket) throws IOException {
-        output = new Output(STORE_PATH+"/"+bucket);
+        output = new Output(MessageStore.STORE_PATH +"/"+bucket);
     }
 }

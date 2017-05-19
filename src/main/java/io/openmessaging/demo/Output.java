@@ -37,7 +37,7 @@ public class Output {
     }
 
     public void writeMessage(BytesMessage bytesMessage) {
-        if (writer.position() >= (mappedSize - 1024)) {
+        if (writer.position() >= (mappedSize - CustomConstants.MAX_MESSAGE_SIZE)) {
             try {
                 reMap();
             } catch (IOException e) {
@@ -45,7 +45,7 @@ public class Output {
             }
         }
 
-        writer.put(MESSAGESTART);
+        writer.put(MESSAGE_START);
 
         //序列化body的长度和主体
         byte[] data = bytesMessage.getBody();
@@ -117,7 +117,7 @@ public class Output {
 
         //标记为PROPERTIS_START
         DefaultKeyValue properties = (DefaultKeyValue) bytesMessage.properties();
-        writer.put(PROPERTIS_START);
+        writer.put(PROPERTIES_START);
         //序列化其中的map
         Map<String, Object> map = properties.getMap();
         mapToBytes(map);

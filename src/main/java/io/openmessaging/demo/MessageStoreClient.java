@@ -1,7 +1,6 @@
 package io.openmessaging.demo;
 
 import io.openmessaging.Message;
-import io.openmessaging.tester.Constants;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,7 +19,11 @@ public class MessageStoreClient {
     //存放bucket到消息阅读器的映射
     private final Map<String, MessageReader> store = new ConcurrentHashMap<>();
 
-    private static final String STORE_PATH = Constants.STORE_PATH;
+    private static String STORE_PATH ;
+
+    public void initPath(String path) {
+        STORE_PATH = path;
+    }
 
 
     //用queue来标识线程

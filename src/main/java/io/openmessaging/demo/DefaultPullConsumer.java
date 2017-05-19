@@ -16,6 +16,8 @@ public class DefaultPullConsumer implements PullConsumer {
 
     public DefaultPullConsumer(KeyValue properties) {
         this.properties = properties;
+        String storePath = properties.getString("STORE_PATH");
+        messageStore.initPath(storePath);
     }
 
 

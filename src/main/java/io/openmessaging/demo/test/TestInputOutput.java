@@ -15,7 +15,6 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.openmessaging.tester.Constants.STORE_PATH;
 
 /**
  * Created by JesonLee
@@ -23,7 +22,7 @@ import static io.openmessaging.tester.Constants.STORE_PATH;
  */
 public class TestInputOutput {
 
-    private String fileName = STORE_PATH + "/" + "test";
+    private String fileName = "";
     private MessageFactory messageFactory = new DefaultMessageFactory();
     private int messageNumber = 100000;
 
@@ -103,7 +102,7 @@ public class TestInputOutput {
     @Test
     public void test2() throws IOException {
 
-        String file = STORE_PATH+"QUEUE_0";
+        String file = ""+"QUEUE_0";
         RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
         MappedByteBuffer mappedByteBuffer;
 

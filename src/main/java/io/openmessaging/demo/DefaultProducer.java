@@ -10,6 +10,8 @@ public class DefaultProducer  implements Producer {
 
     public DefaultProducer(KeyValue properties) {
         this.properties = properties;
+        String path = properties.getString("STORE_PATH");
+        messageStore.initPath(path);
     }
 
     public DefaultProducer() {

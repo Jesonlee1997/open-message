@@ -28,8 +28,8 @@ public class CustomConstants {
     public static final byte TRACE_ID = 17;
 
     //判断标识
-    public static final byte MESSAGESTART = 100;
-    public static final byte PROPERTIS_START = 101;
+    public static final byte MESSAGE_START = 100;
+    public static final byte PROPERTIES_START = 101;
     public static final byte IS_PROPERTY_FIELD = 102;
 
     //类型标识
@@ -37,6 +37,9 @@ public class CustomConstants {
     public static final byte LONG = 2;
     public static final byte DOUBLE = 4;
     public static final byte STRING = 8;
+
+    //一些字段值
+    public static final int MAX_MESSAGE_SIZE = 128 * 1024;
 
     public static final Map<String, Byte> HEADERS = new HashMap<String, Byte>(20) {{
         put("MessageId", MESSAGE_ID);

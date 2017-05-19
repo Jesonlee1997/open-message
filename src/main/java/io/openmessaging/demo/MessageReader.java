@@ -20,7 +20,6 @@ import static io.openmessaging.demo.CustomConstants.*;
 public class MessageReader {
     private RandomAccessFile memoryMappedFile;
     private static final long MAPPED_SIZE = 16 * 1024 * 1024;//表示一次映射的字节数
-    private static final int CORDON = 1024;//buffer的警戒线，预防每当Buffer越界
     private MappedByteBuffer buffer;//初始的buffer
     private final Map<Thread, Input> readers = new HashMap<>();
     private Work work;
@@ -114,7 +113,7 @@ public class MessageReader {
         }
 
         public Message readMessage() {
-            if (MAPPED_SIZE - position <= CORDON) {
+            if (MAPPED_SIZE - position <= CustomConstants.MAX_MESSAGE_SIZE) {
                 startPosition = startPosition + position;
                 position = 0;
                 mappedByteBuffer = work.remap(startPosition);
@@ -122,7 +121,7 @@ public class MessageReader {
                     return null;
                 }
             }
-            if (mappedByteBuffer.get(position) != MESSAGESTART) {
+            if (mappedByteBuffer.get(position) != MESSAGE_START) {
                 return null;
             }
 
@@ -141,7 +140,7 @@ public class MessageReader {
             //序列化Headers
             byte headerNum;
 
-            while ((headerNum = mappedByteBuffer.get(position++)) != PROPERTIS_START) {
+            while ((headerNum = mappedByteBuffer.get(position++)) != PROPERTIES_START) {
                 switch (headerNum) {
                     case TOPIC:
                         int length = mappedByteBuffer.getInt(position);
